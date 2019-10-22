@@ -496,32 +496,22 @@ ros)
 		zenity --info --width=400 --text="An existing ROS installation found at /opt/ros; skip installing new ROS!"  --height=100
 	else
 		if [ "$UBUNTU_16" = true ]; then
-			progressbarinfo "Installing ROS Kinetic ..."
+            ROS_DISTRO="kinetic"
+		elif [ "$UBUNTU_18" = true ]; then
+            ROS_DISTRO="melodic"
+        fi
+			progressbarinfo "Installing ROS $ROS_DISTRO..."
 			check_sudo
 			sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
 			sudo apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
 			sudo apt-get update
 			subprogress "20"
-			sudo apt-get install -y ros-kinetic-ros-base ros-kinetic-joy
-			echo "source /opt/ros/kinetic/setup.bash" >> ~/.bashrc
+			sudo apt-get install -y ros-$ROS_DISTRO-desktop
+			echo "source /opt/ros/$ROS_DISTRO/setup.bash" >> ~/.bashrc
 			subprogress "80"
 			source ~/.bashrc
 			sudo rosdep init
 			rosdep update
-		elif [ "$UBUNTU_18" = true ]; then
-			progressbarinfo "Installing ROS Melodic ..."
-			check_sudo
-			sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
-			sudo apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
-			sudo apt update
-			subprogress "20"
-			sudo apt install -y ros-melodic-ros-base ros-melodic-joy
-			subprogress "80"
-			echo "source /opt/ros/melodic/setup.bash" >> ~/.bashrc
-			source ~/.bashrc
-			sudo rosdep init
-			rosdep update
-		fi
 	fi
 ;;
 
