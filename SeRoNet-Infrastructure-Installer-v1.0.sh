@@ -279,7 +279,9 @@ tooling)
 	chmod +x $TOOLING_LAUNCHER
 	mv $TOOLING_LAUNCHER $HOME/.local/share/applications/
 	cp $HOME/.local/share/applications/$TOOLING_LAUNCHER $HOME/Desktop/
-	gio set $HOME/Desktop/$TOOLING_LAUNCHER "metadata::trusted" yes
+	if [ -x "$(command -v gio)" ]; then
+		gio set $HOME/Desktop/$TOOLING_LAUNCHER "metadata::trusted" yes
+	fi
 ;;
 
 ###############################################################################
