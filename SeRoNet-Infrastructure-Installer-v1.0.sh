@@ -279,6 +279,11 @@ tooling)
 	chmod +x $TOOLING_LAUNCHER
 	mv $TOOLING_LAUNCHER $HOME/.local/share/applications/
 	cp $HOME/.local/share/applications/$TOOLING_LAUNCHER $HOME/Desktop/
+	if ! [ -x "$(command -v gio)" ]; then
+		progressbarinfo "Installing dependency libglib2.0-bin (to use the GIO tool) ..."
+		check_sudo
+		sudo apt-get install -y libglib2.0-bin
+	fi
 	if [ -x "$(command -v gio)" ]; then
 		gio set $HOME/Desktop/$TOOLING_LAUNCHER "metadata::trusted" yes
 	fi
