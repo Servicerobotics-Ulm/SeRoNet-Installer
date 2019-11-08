@@ -278,7 +278,7 @@ tooling)
 	cd $INSTALLATION_DIR
 	chmod +x $TOOLING_LAUNCHER
 	mv $TOOLING_LAUNCHER $HOME/.local/share/applications/
-	cp $HOME/.local/share/applications/$TOOLING_LAUNCHER $HOME/Desktop/
+	cp $HOME/.local/share/applications/$TOOLING_LAUNCHER $(xdg-user-dir DESKTOP)
 
 # The following GIO call fails on plain Ubuntu 18.04 and aborts the installer:
 #	if ! [ -x "$(command -v gio)" ]; then
