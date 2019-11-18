@@ -94,23 +94,23 @@ function start_logging() {
 
 # check if sudo is allowed and if necessary ask for password
 function check_sudo() {
-  local prompt
+	local prompt
 
-  # check for sudo rights without prompt
-  prompt=$(sudo -nv 2>&1)
-  if [ $? -eq 0 ]; then
-    echo "has_sudo"
-  elif echo $prompt | grep -q '^sudo:'; then
-    PASSWD=$(zenity --title "sudo password" --password) || exit 1
-    echo -e "$PASSWD\n" | sudo -Sv
-    if [ $? -eq 0 ]; then
-      echo "has_sudo"
-    else
-      abort
-    fi
-  else
-    abort
-  fi
+	# check for sudo rights without prompt
+	prompt=$(sudo -nv 2>&1)
+	if [ $? -eq 0 ]; then
+		echo "has_sudo"
+	elif echo $prompt | grep -q '^sudo:'; then
+		PASSWD=$(zenity --title "sudo password" --password) || exit 1
+		echo -e "$PASSWD\n" | sudo -Sv
+		if [ $? -eq 0 ]; then
+			echo "has_sudo"
+		else
+			abort
+		fi
+	else
+		abort
+	fi
 }
 
 function update_open62541_installation() {
@@ -223,16 +223,16 @@ menu)
 
 	CURRENT_ACTION_NUMBER=$((0))
 	for CURR_ACTION in $ACTIONS; do
-	    # execute the next action
-	    echo "#### Execute installation step $CURR_ACTION ####"
-	    bash $SCRIPT_NAME $CURR_ACTION $INSTALLATION_DIR $LOGFILE $CURRENT_ACTION_NUMBER $SELECTED_ACTIONS_COUNTER
-	    # abort executing further commands if the previos command returned with != 0
-	    if [ $? -ne 0 ]; then
-	      exit $?
-	    fi
-	    # calculate the progress percentage number and print it to the /tmp/install-msg.log, so zenity gets updated
-	    CURRENT_ACTION_NUMBER=$(($CURRENT_ACTION_NUMBER + 1))
-	    awk "BEGIN { print $CURRENT_ACTION_NUMBER/$SELECTED_ACTIONS_COUNTER*100 }" >> /tmp/install-msg.log
+		# execute the next action
+		echo "#### Execute installation step $CURR_ACTION ####"
+		bash $SCRIPT_NAME $CURR_ACTION $INSTALLATION_DIR $LOGFILE $CURRENT_ACTION_NUMBER $SELECTED_ACTIONS_COUNTER
+		# abort executing further commands if the previos command returned with != 0
+		if [ $? -ne 0 ]; then
+			exit $?
+		fi
+		# calculate the progress percentage number and print it to the /tmp/install-msg.log, so zenity gets updated
+		CURRENT_ACTION_NUMBER=$(($CURRENT_ACTION_NUMBER + 1))
+		awk "BEGIN { print $CURRENT_ACTION_NUMBER/$SELECTED_ACTIONS_COUNTER*100 }" >> /tmp/install-msg.log
 	done
 	
 	zenity --info --width=400 --text="Installation Finished! Some environment settings in .profile have been updated. In order to use them, do one of the following steps:\n\n- Restart your computer\n- Logout/Login again, or\n- Execute 'source ~/.profile'"
@@ -506,22 +506,22 @@ ros)
 		zenity --info --width=400 --text="An existing ROS installation found at /opt/ros; skip installing new ROS!"  --height=100
 	else
 		if [ "$UBUNTU_16" = true ]; then
-            ROS_DISTRO="kinetic"
+			ROS_DISTRO="kinetic"
 		elif [ "$UBUNTU_18" = true ]; then
-            ROS_DISTRO="melodic"
-        fi
-			progressbarinfo "Installing ROS $ROS_DISTRO..."
-			check_sudo
-			sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
-			sudo apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
-			sudo apt-get update
-			subprogress "20"
-			sudo apt-get install -y ros-$ROS_DISTRO-desktop
-			echo "source /opt/ros/$ROS_DISTRO/setup.bash" >> ~/.bashrc
-			subprogress "80"
-			source ~/.bashrc
-			sudo rosdep init
-			rosdep update
+			ROS_DISTRO="melodic"
+		fi
+		progressbarinfo "Installing ROS $ROS_DISTRO..."
+		check_sudo
+		sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
+		sudo apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
+		sudo apt-get update
+		subprogress "20"
+		sudo apt-get install -y ros-$ROS_DISTRO-desktop
+		echo "source /opt/ros/$ROS_DISTRO/setup.bash" >> ~/.bashrc
+		subprogress "80"
+		source ~/.bashrc
+		sudo rosdep init
+		rosdep update
 	fi
 ;;
 
