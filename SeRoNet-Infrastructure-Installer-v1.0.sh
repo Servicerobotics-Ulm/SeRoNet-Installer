@@ -397,7 +397,7 @@ ace-smartsoft)
 	mkdir -p build
 	cd build || askabort
 	cmake ..
-	make install || askabort
+	make || askabort
 ;;
 
 ###############################################################################
