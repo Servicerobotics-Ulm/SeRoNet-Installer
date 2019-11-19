@@ -370,7 +370,7 @@ ace-smartsoft)
 		cd AceSmartSoftFramework
 	fi
 
-	subprogress "70"
+	subprogress "50"
 
 	progressbarinfo "Building the ACE/SmartSoft Kernel ..."
 	mkdir -p build
@@ -378,6 +378,26 @@ ace-smartsoft)
 	cmake ..
 	make install || askabort
 
+	subprogress "70"
+
+	progressbarinfo "Cloning the UtilityRepository ..."
+	cd $INSTALLATION_DIR/smartsoft-ace-mdsd-v3/repos || askabort
+	if [ -d UtilityRepository ]; then
+		cd UtilityRepository
+		git reset --hard HEAD
+		git pull || askabort
+	else
+		git clone https://github.com/Servicerobotics-Ulm/UtilityRepository.git || askabort
+		cd UtilityRepository
+	fi
+
+	subprogress "80"
+
+	progressbarinfo "Building the UtilityRepository ..."
+	mkdir -p build
+	cd build || askabort
+	cmake ..
+	make install || askabort
 ;;
 
 ###############################################################################
