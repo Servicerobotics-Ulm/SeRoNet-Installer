@@ -45,7 +45,7 @@ if [ $# -gt 4 ]; then
 fi
 
 # these variables define the used package versions/names
-TOOLING_VERSION="1.0"
+TOOLING_VERSION="1.1"
 TOOLING_URL="https://web2.servicerobotik-ulm.de/files/SeRoNet_Tooling/$TOOLING_VERSION/SeRoNet-Tooling-v$TOOLING_VERSION.tar.gz"
 TOOLING_LAUNCHER="SeRoNet-Tooling.desktop"
 OPEN62541_VERSION="v1.0"
