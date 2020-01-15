@@ -545,4 +545,24 @@ ros)
 	fi
 ;;
 
+###############################################################################
+non-visual-installation)
+
+	CURRENT_ACTION_NUMBER=$((0))
+	ACTIONS="ace-smartsoft opcua-backend opcua-devices ros"
+	SELECTED_ACTIONS_COUNTER=4
+	for CURR_ACTION in $ACTIONS; do
+	    # execute the next action
+	    echo "#### Execute installation step $CURR_ACTION ####"
+	    bash $SCRIPT_NAME $CURR_ACTION $INSTALLATION_DIR $LOGFILE $CURRENT_ACTION_NUMBER $SELECTED_ACTIONS_COUNTER
+	    # abort executing further commands if the previos command returned with != 0
+	    if [ $? -ne 0 ]; then
+	      exit $?
+	    fi
+	    # calculate the progress percentage number and print it to the /tmp/install-msg.log
+	    CURRENT_ACTION_NUMBER=$(($CURRENT_ACTION_NUMBER + 1))
+	    awk "BEGIN { print $CURRENT_ACTION_NUMBER/$SELECTED_ACTIONS_COUNTER*100 }" >> /tmp/install-msg.log
+	done
+;;
+
 esac

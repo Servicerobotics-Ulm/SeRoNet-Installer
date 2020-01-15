@@ -1,0 +1,14 @@
+language: bash
+
+matrix:
+  include:
+    - os: linux
+      dist: xenial
+      sudo: required
+    - os: linux
+      dist: bionic
+      sudo: required
+before_install:
+  - sudo apt-get -y install zenity
+script:
+  - bash SeRoNet-Infrastructure-Installer-latest.sh non-visual-installation
