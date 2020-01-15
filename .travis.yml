@@ -3,4 +3,4 @@ language: bash
 before_install:
   - sudo apt-get -y install zenity
 script:
-  - bash SeRoNet-Infrastructure-Installer-v1.0.sh
+  - bash SeRoNet-Infrastructure-Installer-v1.0.sh non-visual-installation
