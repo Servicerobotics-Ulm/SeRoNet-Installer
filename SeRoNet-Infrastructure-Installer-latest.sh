@@ -45,7 +45,7 @@ if [ $# -gt 4 ]; then
 fi
 
 # these variables define the used package versions/names
-TOOLING_VERSION="1.0"
+TOOLING_VERSION="1.1"
 TOOLING_URL="https://web2.servicerobotik-ulm.de/files/SeRoNet_Tooling/$TOOLING_VERSION/SeRoNet-Tooling-v$TOOLING_VERSION.tar.gz"
 TOOLING_LAUNCHER="SeRoNet-Tooling.desktop"
 OPEN62541_VERSION="v1.0"
@@ -278,8 +278,18 @@ tooling)
 	cd $INSTALLATION_DIR
 	chmod +x $TOOLING_LAUNCHER
 	mv $TOOLING_LAUNCHER $HOME/.local/share/applications/
-	cp $HOME/.local/share/applications/$TOOLING_LAUNCHER $HOME/Desktop/
-	gio set $HOME/Desktop/$TOOLING_LAUNCHER "metadata::trusted" yes
+	cp $HOME/.local/share/applications/$TOOLING_LAUNCHER $(xdg-user-dir DESKTOP)
+
+# The following GIO call fails on plain Ubuntu 18.04 and aborts the installer:
+#	if ! [ -x "$(command -v gio)" ]; then
+#		progressbarinfo "Installing dependency libglib2.0-bin (to use the GIO tool) ..."
+#		check_sudo
+#		sudo apt-get install -y libglib2.0-bin
+#	fi
+#	if [ -x "$(command -v gio)" ]; then
+#		gio set $HOME/Desktop/$TOOLING_LAUNCHER "metadata::trusted" yes
+#	fi
+
 ;;
 
 ###############################################################################
@@ -360,7 +370,7 @@ ace-smartsoft)
 		cd AceSmartSoftFramework
 	fi
 
-	subprogress "70"
+	subprogress "50"
 
 	progressbarinfo "Building the ACE/SmartSoft Kernel ..."
 	mkdir -p build
@@ -368,6 +378,26 @@ ace-smartsoft)
 	cmake ..
 	make install || askabort
 
+	subprogress "70"
+
+	progressbarinfo "Cloning the UtilityRepository ..."
+	cd $INSTALLATION_DIR/smartsoft-ace-mdsd-v3/repos || askabort
+	if [ -d UtilityRepository ]; then
+		cd UtilityRepository
+		git reset --hard HEAD
+		git pull || askabort
+	else
+		git clone https://github.com/Servicerobotics-Ulm/UtilityRepository.git || askabort
+		cd UtilityRepository
+	fi
+
+	subprogress "80"
+
+	progressbarinfo "Building the UtilityRepository ..."
+	mkdir -p build
+	cd build || askabort
+	cmake ..
+	make || askabort
 ;;
 
 ###############################################################################
@@ -496,32 +526,22 @@ ros)
 		zenity --info --width=400 --text="An existing ROS installation found at /opt/ros; skip installing new ROS!"  --height=100
 	else
 		if [ "$UBUNTU_16" = true ]; then
-			progressbarinfo "Installing ROS Kinetic ..."
+            ROS_DISTRO="kinetic"
+		elif [ "$UBUNTU_18" = true ]; then
+            ROS_DISTRO="melodic"
+        fi
+			progressbarinfo "Installing ROS $ROS_DISTRO..."
 			check_sudo
 			sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
 			sudo apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
 			sudo apt-get update
 			subprogress "20"
-			sudo apt-get install -y ros-kinetic-ros-base ros-kinetic-joy
-			echo "source /opt/ros/kinetic/setup.bash" >> ~/.bashrc
+			sudo apt-get install -y ros-$ROS_DISTRO-desktop
+			echo "source /opt/ros/$ROS_DISTRO/setup.bash" >> ~/.bashrc
 			subprogress "80"
 			source ~/.bashrc
 			sudo rosdep init
 			rosdep update
-		elif [ "$UBUNTU_18" = true ]; then
-			progressbarinfo "Installing ROS Melodic ..."
-			check_sudo
-			sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
-			sudo apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
-			sudo apt update
-			subprogress "20"
-			sudo apt install -y ros-melodic-ros-base ros-melodic-joy
-			subprogress "80"
-			echo "source /opt/ros/melodic/setup.bash" >> ~/.bashrc
-			source ~/.bashrc
-			sudo rosdep init
-			rosdep update
-		fi
 	fi
 ;;
 
